@@ -1,0 +1,72 @@
+{
+   "Version" : 0.2,
+   "ModuleName" : "Go",
+   "Options" : {
+      "Warnings" : "All",
+      "TargetType" : "Executable",
+      "TargetFileName" : "Go",
+      "Libraries" : [
+         "ecere"
+      ]
+   },
+   "Configurations" : [
+      {
+         "Name" : "Debug",
+         "Options" : {
+            "Debug" : true,
+            "Optimization" : "None",
+            "PreprocessorDefinitions" : [
+               "_DEBUG"
+            ],
+            "FastMath" : false
+         }
+      },
+      {
+         "Name" : "Release",
+         "Options" : {
+            "Debug" : false,
+            "Optimization" : "Speed",
+            "FastMath" : true
+         }
+      },
+      {
+         "Name" : "Emscripten",
+         "Options" : {
+            "Optimization" : "Speed",
+            "PreprocessorDefinitions" : [
+               "ECERE_STATIC"
+            ],
+            "TargetFileName" : "Go.html",
+            "Libraries" : [
+               "ecereStatic",
+               "z",
+               "freetype",
+               "jpeg",
+               "png"
+            ],
+            "LibraryDirs" : [
+               "/ecere-sdk/ecere/obj/emscripten.linux.emscripten"
+            ],
+            "FastMath" : true
+         }
+      }
+   ],
+   "Files" : [
+      "go.ec"
+   ],
+   "ResourcesPath" : "",
+   "Resources" : [
+      {
+         "Folder" : "ecere",
+         "Files" : [
+            {
+               "Folder" : "shaders",
+               "Files" : [
+                  "../../../ecere/src/gfx/drivers/gl3/default.frag",
+                  "../../../ecere/src/gfx/drivers/gl3/default.vert"
+               ]
+            }
+         ]
+      }
+   ]
+}
