@@ -27,7 +27,7 @@ bool runAsServer;
 
 GoConnection connection;
 DotState myColor;
-DotState playerTurn;
+DotState playerTurn = white;
 
 class GoApp : GuiApplication
 {
@@ -41,13 +41,14 @@ class GoApp : GuiApplication
          {
             if(board[y][x] == empty)
             {
-               board[y][x] = playerColor;
+               board[y][x] = (DotState)color;
                goWindow.checkSurrounded(x, y - 1);
                goWindow.checkSurrounded(x, y + 1);
                goWindow.checkSurrounded(x - 1, y);
                goWindow.checkSurrounded(x + 1, y);
             }
             playerTurn = (DotState)color == black ? white : black;
+            goWindow.Update(null);
          }
       };
       if(runAsServer)

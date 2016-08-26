@@ -67,6 +67,14 @@
                   "../../../ecere/src/gfx/drivers/gl3/default.vert"
                ]
             }
+         ],
+         "Configurations" : [
+            {
+               "Name" : "Debug",
+               "Options" : {
+                  "ExcludeFromBuild" : true
+               }
+            }
          ]
       }
    ]
