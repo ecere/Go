@@ -4,6 +4,8 @@ import static "ecere"
 import "ecere"
 #endif
 
+import remote "goConnection"
+
 define margin = 40;
 define goSize = 19;
 define tileSize = 32;
@@ -19,8 +21,43 @@ enum DotState : byte
 DotState board[goSize][goSize];
 
 bool placing;
-DotState playerColor = white;
 Point piecePos;
+
+bool runAsServer;
+
+GoConnection connection;
+DotState myColor;
+DotState playerTurn;
+
+class GoApp : GuiApplication
+{
+   bool Init()
+   {
+      runAsServer = MessageBox { contents = "Run Server?", type = yesNo }.Modal() == yes;
+
+      connection = GoConnection
+      {
+         void notifyMovePlayed(int color, int x, int y)
+         {
+            if(board[y][x] == empty)
+            {
+               board[y][x] = playerColor;
+               goWindow.checkSurrounded(x, y - 1);
+               goWindow.checkSurrounded(x, y + 1);
+               goWindow.checkSurrounded(x - 1, y);
+               goWindow.checkSurrounded(x + 1, y);
+            }
+            playerTurn = (DotState)color == black ? white : black;
+         }
+      };
+      if(runAsServer)
+         goService.Start();
+      myColor = runAsServer ? black : white;
+      connection.Connect("192.168.38.219", goPort);
+      connection.join();
+      return true;
+   }
+}
 
 class GoWindow : Window
 {
@@ -85,17 +122,20 @@ class GoWindow : Window
 
    bool OnLeftButtonDown(int x, int y, Modifiers mods)
    {
-      Point pos
+      if(myColor == playerTurn)
       {
-         (x - margin + tileSize/2) / tileSize,
-         (y - margin + tileSize/2) / tileSize
-      };
-      if(pos.x >= 0 && pos.x < goSize && pos.y >= 0 && pos.y < goSize)
-      {
-         piecePos = pos;
-         placing = true;
-         Capture();
-         Update(null);
+         Point pos
+         {
+            (x - margin + tileSize/2) / tileSize,
+            (y - margin + tileSize/2) / tileSize
+         };
+         if(pos.x >= 0 && pos.x < goSize && pos.y >= 0 && pos.y < goSize)
+         {
+            piecePos = pos;
+            placing = true;
+            Capture();
+            Update(null);
+         }
       }
       return true;
    }
@@ -128,9 +168,7 @@ class GoWindow : Window
             (y - margin + tileSize/2) / tileSize
          };
          if(pos.x >= 0 && pos.x < goSize-1 && pos.y >= 0 && pos.y < goSize-1)
-         {
-            movePlayed(pos.x, pos.y);
-         }
+            connection.playMove(myColor, pos.x, pos.y);
          placing = false;
          ReleaseCapture();
          Update(null);
@@ -150,21 +188,6 @@ class GoWindow : Window
             board[y][x] = empty;
          }
       }
-   }
-
-   bool movePlayed(int x, int y)
-   {
-      if(board[y][x] == empty)
-      {
-         board[y][x] = playerColor;
-         checkSurrounded(x, y - 1);
-         checkSurrounded(x, y + 1);
-         checkSurrounded(x - 1, y);
-         checkSurrounded(x + 1, y);
-         playerColor = playerColor == white ? black : white;
-         return true;
-      }
-      return false;
    }
 }
 
